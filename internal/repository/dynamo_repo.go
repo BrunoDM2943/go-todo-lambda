@@ -6,6 +6,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/google/uuid"
+	
 )
 
 const TableName = "todo"
@@ -26,6 +28,7 @@ func NewDynamoDB() TodoRepository {
 }
 
 func (repo *dynamoDBRepo) Save(item *model.Item) error {
+	item.ID = uuid.NewString()
 	marshalled, _ := dynamodbattribute.MarshalMap(item)
 	_, err := repo.client.PutItem(&dynamodb.PutItemInput{
 		Item:      marshalled,
