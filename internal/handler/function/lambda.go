@@ -13,7 +13,10 @@ import (
 
 type lambdaHandler struct {
 	todoService todo.Service
+	routes      map[string]handleFunc
 }
+
+type handleFunc func(events.APIGatewayProxyRequest) events.APIGatewayProxyResponse
 
 var successResponse = events.APIGatewayProxyResponse{
 	StatusCode: http.StatusOK,
@@ -23,6 +26,15 @@ var createdResponse = events.APIGatewayProxyResponse{
 	StatusCode: http.StatusCreated,
 }
 
+func (handler *lambdaHandler) BuildRoutes() {
+	handler.routes = map[string]handleFunc{
+		"GET:/todo-api":         handler.getAllItems,
+		"POST:/todo-api":        handler.postHandler,
+		"GET:/todo-api/{id}":    handler.getItem,
+		"DELETE:/todo-api/{id}": handler.deleteHandler,
+	}
+}
+
 func NewLambdaHandler(todoService todo.Service) *lambdaHandler {
 	return &lambdaHandler{
 		todoService: todoService,
@@ -30,14 +42,14 @@ func NewLambdaHandler(todoService todo.Service) *lambdaHandler {
 }
 
 func (handler *lambdaHandler) HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	response := buildErrorResponse("Not implemented", http.StatusNotImplemented)
-	switch request.HTTPMethod {
-	case "GET":
-		response = handler.getHandler(request)
-	case "POST":
-		response = handler.postHandler(request)
-	case "DELETE":
-		response = handler.deleteHandler(request)
+	key := fmt.Sprintf("%s:%s", request.HTTPMethod, request.Path)
+	fmt.Printf("Receiving the following request: %s", key)
+	functionHandler := handler.routes[key]
+	var response events.APIGatewayProxyResponse
+	if functionHandler == nil {
+		response = buildErrorResponse("Not implemented", http.StatusNotImplemented)
+	} else {
+		response = functionHandler(request)
 	}
 	return response, nil
 }
@@ -66,25 +78,25 @@ func (handler *lambdaHandler) postHandler(request events.APIGatewayProxyRequest)
 	return createdResponse
 }
 
-func (handler *lambdaHandler) getHandler(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
-	id := request.PathParameters["id"]
-	if id == "" {
-		items, err := handler.todoService.GetItems()
-		if err != nil {
-			return buildErrorResponse(err.Error(), http.StatusInternalServerError)
-		}
-		body, _ := json.Marshal(items)
-		return buildSuccessResponse(string(body))
-	} else {
-		item, err := handler.todoService.GetItem(id)
-		if item == nil {
-			return buildErrorResponse(fmt.Sprintf("ID %s not found", id), http.StatusNotFound)
-		} else if err != nil {
-			return buildErrorResponse(err.Error(), http.StatusInternalServerError)
-		}
-		body, _ := json.Marshal(item)
-		return buildSuccessResponse(string(body))
+func (handler *lambdaHandler) getAllItems(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+	items, err := handler.todoService.GetItems()
+	if err != nil {
+		return buildErrorResponse(err.Error(), http.StatusInternalServerError)
 	}
+	body, _ := json.Marshal(items)
+	return buildSuccessResponse(string(body))
+}
+
+func (handler *lambdaHandler) getItem(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+	id := request.PathParameters["id"]
+	item, err := handler.todoService.GetItem(id)
+	if item == nil {
+		return buildErrorResponse(fmt.Sprintf("ID %s not found", id), http.StatusNotFound)
+	} else if err != nil {
+		return buildErrorResponse(err.Error(), http.StatusInternalServerError)
+	}
+	body, _ := json.Marshal(item)
+	return buildSuccessResponse(string(body))
 }
 
 func buildErrorResponse(message string, statusCode int) events.APIGatewayProxyResponse {

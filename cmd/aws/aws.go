@@ -7,5 +7,7 @@ import (
 )
 
 func StartLambda() {
-	lambda.Start(function.NewLambdaHandler(cdi.GetTodoService()).HandleRequest)
+	handler := function.NewLambdaHandler(cdi.GetTodoService())
+	handler.BuildRoutes()
+	lambda.Start(handler.HandleRequest)
 }

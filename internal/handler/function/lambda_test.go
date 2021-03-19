@@ -23,13 +23,15 @@ func TestGetHandler(t *testing.T) {
 
 	mockService := mock_todo.NewMockService(ctrl)
 	handler := NewLambdaHandler(mockService)
+	handler.BuildRoutes()
 
 	t.Run("Test Get for one ID", func(t *testing.T) {
 
 		mockService.EXPECT().GetItem(gomock.Eq(defaultID)).Return(&model.Item{}, nil)
 
-		response := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
+		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "GET",
+			Path:       "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": defaultID,
 			},
@@ -41,8 +43,9 @@ func TestGetHandler(t *testing.T) {
 
 		mockService.EXPECT().GetItem(gomock.Eq(defaultID)).Return(&model.Item{}, errors.New("Error"))
 
-		response := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
+		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "GET",
+			Path:       "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": defaultID,
 			},
@@ -54,8 +57,9 @@ func TestGetHandler(t *testing.T) {
 
 		mockService.EXPECT().GetItem(gomock.Eq(defaultID)).Return(nil, nil)
 
-		response := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
+		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "GET",
+			Path:       "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": defaultID,
 			},
@@ -65,8 +69,9 @@ func TestGetHandler(t *testing.T) {
 
 	t.Run("Test Get for one ID Bad Request", func(t *testing.T) {
 		t.SkipNow()
-		response := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
+		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "GET",
+			Path:       "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": "0",
 			},
@@ -78,8 +83,9 @@ func TestGetHandler(t *testing.T) {
 
 		mockService.EXPECT().GetItems().Return([]*model.Item{}, nil)
 
-		response := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
+		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "GET",
+			Path:       "/todo-api",
 			PathParameters: map[string]string{
 				"id": "",
 			},
@@ -91,8 +97,9 @@ func TestGetHandler(t *testing.T) {
 
 		mockService.EXPECT().GetItems().Return(nil, errors.New("Error"))
 
-		response := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
+		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "GET",
+			Path:       "/todo-api",
 			PathParameters: map[string]string{
 				"id": "",
 			},
@@ -107,13 +114,15 @@ func TestDeleteHandler(t *testing.T) {
 
 	mockService := mock_todo.NewMockService(ctrl)
 	handler := NewLambdaHandler(mockService)
+	handler.BuildRoutes()
 
 	t.Run("Test Delete ID - OK", func(t *testing.T) {
 
 		mockService.EXPECT().DeleteItem(gomock.Eq(defaultID)).Return(nil)
 
-		response := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
+		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "DELETE",
+			Path:       "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": defaultID,
 			},
@@ -125,8 +134,9 @@ func TestDeleteHandler(t *testing.T) {
 
 		mockService.EXPECT().DeleteItem(gomock.Eq(defaultID)).Return(errors.New("Error"))
 
-		response := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
+		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "DELETE",
+			Path:       "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": defaultID,
 			},
@@ -136,8 +146,9 @@ func TestDeleteHandler(t *testing.T) {
 
 	t.Run("Test Delete ID - Bad Request", func(t *testing.T) {
 
-		response := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
+		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "DELETE",
+			Path:       "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": "",
 			},
@@ -152,6 +163,7 @@ func TestPostHandler(t *testing.T) {
 
 	mockService := mock_todo.NewMockService(ctrl)
 	handler := NewLambdaHandler(mockService)
+	handler.BuildRoutes()
 
 	t.Run("Test Post Item - OK", func(t *testing.T) {
 		item := &model.Item{
@@ -160,16 +172,18 @@ func TestPostHandler(t *testing.T) {
 		}
 		mockService.EXPECT().PostItem(gomock.Eq(item)).Return(nil)
 
-		response := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
+		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "POST",
+			Path:       "/todo-api",
 			Body:       `{"title": "List", "text":"Homework"}`,
 		})
 		assert.Equal(t, http.StatusCreated, response.StatusCode)
 	})
 
 	t.Run("Test Post Item - BadRequest ", func(t *testing.T) {
-		response := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
+		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "POST",
+			Path:       "/todo-api",
 			Body:       `{"title": "", "text":""}`,
 		})
 		assert.Equal(t, http.StatusBadRequest, response.StatusCode)
@@ -182,8 +196,9 @@ func TestPostHandler(t *testing.T) {
 		}
 		mockService.EXPECT().PostItem(gomock.Eq(item)).Return(errors.New("Error"))
 
-		response := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
+		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "POST",
+			Path:       "/todo-api",
 			Body:       `{"title": "List", "text":"Homework"}`,
 		})
 		assert.Equal(t, http.StatusInternalServerError, response.StatusCode)
