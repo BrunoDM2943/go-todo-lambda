@@ -31,7 +31,7 @@ func TestGetHandler(t *testing.T) {
 
 		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "GET",
-			Path:       "/todo-api/{id}",
+			Resource:   "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": defaultID,
 			},
@@ -45,7 +45,7 @@ func TestGetHandler(t *testing.T) {
 
 		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "GET",
-			Path:       "/todo-api/{id}",
+			Resource:   "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": defaultID,
 			},
@@ -59,7 +59,7 @@ func TestGetHandler(t *testing.T) {
 
 		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "GET",
-			Path:       "/todo-api/{id}",
+			Resource:   "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": defaultID,
 			},
@@ -71,7 +71,7 @@ func TestGetHandler(t *testing.T) {
 		t.SkipNow()
 		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "GET",
-			Path:       "/todo-api/{id}",
+			Resource:   "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": "0",
 			},
@@ -85,7 +85,7 @@ func TestGetHandler(t *testing.T) {
 
 		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "GET",
-			Path:       "/todo-api",
+			Resource:   "/todo-api",
 			PathParameters: map[string]string{
 				"id": "",
 			},
@@ -99,7 +99,7 @@ func TestGetHandler(t *testing.T) {
 
 		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "GET",
-			Path:       "/todo-api",
+			Resource:   "/todo-api",
 			PathParameters: map[string]string{
 				"id": "",
 			},
@@ -122,7 +122,7 @@ func TestDeleteHandler(t *testing.T) {
 
 		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "DELETE",
-			Path:       "/todo-api/{id}",
+			Resource:   "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": defaultID,
 			},
@@ -136,7 +136,7 @@ func TestDeleteHandler(t *testing.T) {
 
 		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "DELETE",
-			Path:       "/todo-api/{id}",
+			Resource:   "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": defaultID,
 			},
@@ -148,7 +148,7 @@ func TestDeleteHandler(t *testing.T) {
 
 		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "DELETE",
-			Path:       "/todo-api/{id}",
+			Resource:   "/todo-api/{id}",
 			PathParameters: map[string]string{
 				"id": "",
 			},
@@ -174,7 +174,7 @@ func TestPostHandler(t *testing.T) {
 
 		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "POST",
-			Path:       "/todo-api",
+			Resource:   "/todo-api",
 			Body:       `{"title": "List", "text":"Homework"}`,
 		})
 		assert.Equal(t, http.StatusCreated, response.StatusCode)
@@ -183,7 +183,7 @@ func TestPostHandler(t *testing.T) {
 	t.Run("Test Post Item - BadRequest ", func(t *testing.T) {
 		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "POST",
-			Path:       "/todo-api",
+			Resource:   "/todo-api",
 			Body:       `{"title": "", "text":""}`,
 		})
 		assert.Equal(t, http.StatusBadRequest, response.StatusCode)
@@ -198,7 +198,7 @@ func TestPostHandler(t *testing.T) {
 
 		response, _ := handler.HandleRequest(context.TODO(), events.APIGatewayProxyRequest{
 			HTTPMethod: "POST",
-			Path:       "/todo-api",
+			Resource:   "/todo-api",
 			Body:       `{"title": "List", "text":"Homework"}`,
 		})
 		assert.Equal(t, http.StatusInternalServerError, response.StatusCode)

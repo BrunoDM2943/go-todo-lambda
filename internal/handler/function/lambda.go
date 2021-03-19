@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/BrunoDM2943/go-todo-lambda/internal/constants/model"
@@ -42,8 +43,8 @@ func NewLambdaHandler(todoService todo.Service) *lambdaHandler {
 }
 
 func (handler *lambdaHandler) HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	key := fmt.Sprintf("%s:%s", request.HTTPMethod, request.Path)
-	fmt.Printf("Receiving the following request: %s", key)
+	key := fmt.Sprintf("%s:%s", request.HTTPMethod, request.Resource)
+	log.Printf("Receiving the following request: %s", key)
 	functionHandler := handler.routes[key]
 	var response events.APIGatewayProxyResponse
 	if functionHandler == nil {

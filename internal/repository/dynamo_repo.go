@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/google/uuid"
-	
 )
 
 const TableName = "todo"
@@ -64,7 +63,7 @@ func (repo *dynamoDBRepo) ListAll() ([]*model.Item, error) {
 		return nil, err
 	}
 
-	items := make([]*model.Item, len(result.Items))
+	items := make([]*model.Item, 0)
 
 	for _, scannedItem := range result.Items {
 		item := &model.Item{}
