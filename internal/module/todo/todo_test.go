@@ -16,7 +16,7 @@ var allItems = []*model.Item{
 	{}, {},
 }
 
-const defaultID = int64(1)
+const defaultID = "XPTO"
 
 func TestPostItem(t *testing.T) {
 	ctrl := gomock.NewController(t)

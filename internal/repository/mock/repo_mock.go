@@ -35,7 +35,7 @@ func (m *MockTodoRepository) EXPECT() *MockTodoRepositoryMockRecorder {
 }
 
 // DeleteByID mocks base method.
-func (m *MockTodoRepository) DeleteByID(id int64) error {
+func (m *MockTodoRepository) DeleteByID(id string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteByID", id)
 	ret0, _ := ret[0].(error)
@@ -49,7 +49,7 @@ func (mr *MockTodoRepositoryMockRecorder) DeleteByID(id interface{}) *gomock.Cal
 }
 
 // FindByID mocks base method.
-func (m *MockTodoRepository) FindByID(id int64) (*model.Item, error) {
+func (m *MockTodoRepository) FindByID(id string) (*model.Item, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindByID", id)
 	ret0, _ := ret[0].(*model.Item)

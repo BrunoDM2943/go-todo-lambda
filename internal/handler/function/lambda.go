@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/BrunoDM2943/go-todo-lambda/internal/constants/model"
 	"github.com/BrunoDM2943/go-todo-lambda/internal/module/todo"
@@ -44,11 +43,11 @@ func (handler *lambdaHandler) HandleRequest(ctx context.Context, request events.
 }
 
 func (handler *lambdaHandler) deleteHandler(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
-	id, err := strconv.Atoi(request.PathParameters["id"])
-	if err != nil || id == 0 {
+	id := request.PathParameters["id"]
+	if id == "" {
 		return buildErrorResponse("Invalid ID", http.StatusBadRequest)
 	}
-	if err = handler.todoService.DeleteItem(int64(id)); err != nil {
+	if err := handler.todoService.DeleteItem(id); err != nil {
 		return buildErrorResponse(err.Error(), http.StatusInternalServerError)
 	}
 	return successResponse
@@ -68,8 +67,8 @@ func (handler *lambdaHandler) postHandler(request events.APIGatewayProxyRequest)
 }
 
 func (handler *lambdaHandler) getHandler(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
-	strId := request.PathParameters["id"]
-	if strId == "" {
+	id := request.PathParameters["id"]
+	if id == "" {
 		items, err := handler.todoService.GetItems()
 		if err != nil {
 			return buildErrorResponse(err.Error(), http.StatusInternalServerError)
@@ -77,13 +76,9 @@ func (handler *lambdaHandler) getHandler(request events.APIGatewayProxyRequest) 
 		body, _ := json.Marshal(items)
 		return buildSuccessResponse(string(body))
 	} else {
-		id, err := strconv.Atoi(strId)
-		if err != nil || id == 0 {
-			return buildErrorResponse("Invalid ID", http.StatusBadRequest)
-		}
-		item, err := handler.todoService.GetItem(int64(id))
+		item, err := handler.todoService.GetItem(id)
 		if item == nil {
-			return buildErrorResponse(fmt.Sprintf("ID %d not found", id), http.StatusNotFound)
+			return buildErrorResponse(fmt.Sprintf("ID %s not found", id), http.StatusNotFound)
 		} else if err != nil {
 			return buildErrorResponse(err.Error(), http.StatusInternalServerError)
 		}

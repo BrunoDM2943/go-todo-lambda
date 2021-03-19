@@ -35,7 +35,7 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 }
 
 // DeleteItem mocks base method.
-func (m *MockService) DeleteItem(id int64) error {
+func (m *MockService) DeleteItem(id string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteItem", id)
 	ret0, _ := ret[0].(error)
@@ -49,7 +49,7 @@ func (mr *MockServiceMockRecorder) DeleteItem(id interface{}) *gomock.Call {
 }
 
 // GetItem mocks base method.
-func (m *MockService) GetItem(id int64) (*model.Item, error) {
+func (m *MockService) GetItem(id string) (*model.Item, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetItem", id)
 	ret0, _ := ret[0].(*model.Item)
