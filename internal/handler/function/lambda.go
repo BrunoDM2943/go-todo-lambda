@@ -29,7 +29,7 @@ func NewLambdaHandler(todoService todo.Service) *lambdaHandler {
 	}
 }
 
-func (handler *lambdaHandler) HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+func (handler *lambdaHandler) HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	response := buildErrorResponse("Not implemented", http.StatusNotImplemented)
 	switch request.HTTPMethod {
 	case "GET":
@@ -39,7 +39,7 @@ func (handler *lambdaHandler) HandleRequest(ctx context.Context, request events.
 	case "DELETE":
 		response = handler.deleteHandler(request)
 	}
-	return response
+	return response, nil
 }
 
 func (handler *lambdaHandler) deleteHandler(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
